@@ -199,70 +199,84 @@ class _IllustCardState extends State<IllustCard> {
     var radio = (tooLong)
         ? 1.0
         : store.illusts!.width.toDouble() / store.illusts!.height.toDouble();
-    return Card(
-      margin: EdgeInsets.all(8.0),
-      clipBehavior: Clip.antiAlias,
+    return Material(
       color: Theme.of(context).colorScheme.surface,
-      child: _buildAnimationWraper(
-        context,
-        Column(
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: radio,
-              child: Stack(
-                children: [
-                  Positioned.fill(child: _buildPic(tag, tooLong)),
-                  Positioned(
-                    top: 5.0,
-                    right: 5.0,
-                    child: Row(
-                      children: [
-                        if (userSetting.feedAIBadge &&
-                            store.illusts!.illustAIType == 2)
-                          _buildAIBadge(),
-                        _buildVisibility(),
-                      ],
-                    ),
-                  ),
-                  // Positioned(
-                  //   top: 0,
-                  //   left: 0,
-                  //   child: CustomPaint(
-                  //     size: Size(36, 36),
-                  //     painter: TrianglePainter(),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildBottom(context),
-                if (store.illusts?.series != null) ...[
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              IllustSeriesPage(id: store.illusts!.series!.id),
-                        ),
-                      );
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      margin: EdgeInsets.only(left: 8, bottom: 4),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '${store.illusts?.series?.title ?? ''}',
-                        style: Theme.of(context).textTheme.bodySmall,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0), // 标准化圆角半径
+      ),
+      elevation: 0, // 移除阴影，保持原有视觉风格
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8.0), // 添加与卡片相同的圆角以适配水波纹
+        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        onLongPress: () {
+          _buildLongPressToSaveHint();
+        },
+        onTap: () {
+          _buildInkTap(context, tag);
+        },
+        child: Container(
+          width: double.infinity,
+          child: Column(
+            children: <Widget>[
+              AspectRatio(
+                aspectRatio: radio,
+                child: Stack(
+                  children: [
+                    Positioned.fill(child: _buildPic(tag, tooLong)),
+                    Positioned(
+                      top: 5.0,
+                      right: 5.0,
+                      child: Row(
+                        children: [
+                          if (userSetting.feedAIBadge &&
+                              store.illusts!.illustAIType == 2)
+                            _buildAIBadge(),
+                          _buildVisibility(),
+                        ],
                       ),
                     ),
-                  ),
+                    // Positioned(
+                    //   top: 0,
+                    //   left: 0,
+                    //   child: CustomPaint(
+                    //     size: Size(36, 36),
+                    //     painter: TrianglePainter(),
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildBottom(context),
+                  if (store.illusts?.series != null) ...[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                IllustSeriesPage(id: store.illusts!.series!.id),
+                          ),
+                        );
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        margin: EdgeInsets.only(left: 8, bottom: 4),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '${store.illusts?.series?.title ?? ''}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
