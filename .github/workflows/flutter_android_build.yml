@@ -1,0 +1,56 @@
+name: Build Flutter Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '12'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x' # 您可以根据需要指定具体版本
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Verify code formatting
+        run: flutter format --set-exit-if-changed .
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # 如果您希望为发布版本生成APK，请取消注释以下步骤
+      # - name: Build Split APKs
+      #   run: flutter build apk --split-per-abi --release
+      #
+      # - name: Upload Split APKs
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: split-apks
+      #     path: build/app/outputs/flutter-apk/
