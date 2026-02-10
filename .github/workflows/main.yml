@@ -1,0 +1,36 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: {}
+  
+jobs:
+  Build_Android:
+    runs-on: ubuntu-latest  # Android 构建可以使用 ubuntu 系统，成本更低
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      
+      - name: Check Flutter version
+        run: flutter --version
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      # 如果需要 build_runner（从你的 iOS 配置看有使用）
+      - name: Run build_runner
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      # 构建 APK
+      - name: Build APK
+        run: flutter build apk --release
+      
+      # 上传 APK 产物
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixez-android.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
