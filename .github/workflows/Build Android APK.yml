@@ -5,7 +5,7 @@ on:
   
 jobs:
   Build_Android:
-    runs-on: ubuntu-latest  # Android 构建可以使用 ubuntu 系统，成本更低
+    runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v4
@@ -15,21 +15,16 @@ jobs:
         with:
           channel: 'stable'
       
-      - name: Check Flutter version
-        run: flutter --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter packages pub run build_runner build --delete-conflicting-outputs
       
-      - name: Install dependencies
-        run: flutter pub get
+      # 关键修复：通过 dart-defines 传递 IS_GOOGLEPLAY
+      - name: Build APK (non-Google Play version)
+        run: |
+          # 构建非 Google Play 版本（默认）
+          flutter build apk --release --dart-define=IS_GOOGLEPLAY=false
       
-      # 如果需要 build_runner（从你的 iOS 配置看有使用）
-      - name: Run build_runner
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
-      
-      # 构建 APK
-      - name: Build APK
-        run: flutter build apk --release
-      
-      # 上传 APK 产物
       - uses: actions/upload-artifact@v4
         with:
           name: pixez-android.apk
